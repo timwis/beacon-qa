@@ -1,0 +1,110 @@
+<%= link_to '< Back to call log list', call_logs_path %>
+
+<h2 class="title">Person #<%= @call_log.contact_id %></h1>
+<a href="<%= beacon_contact @call_log.contact_id %>" class="button is-info view-in-beacon">
+  View this person in Beacon
+</a>
+
+<h2 class="title is-4">Original call log</h2>
+<p>From the spreadsheet</p>
+<div class="content">
+  <blockquote>
+    Latest attempt date: <%= @call_log.latest_attempt_date.strftime('%-d %B %Y') %>
+    <%= simple_format @call_log.call_log %>
+  </blockquote>
+</div>
+
+<h2 class="title is-4">Prior to the re-import, these needs existed:</h2>
+<p>These would have been created manually.</p>
+<% @call_log.needs.each do |need| %>
+    <div class="message existing-need">
+      <div class="message-header">
+        <%= need.category.humanize %>
+      </div>
+      <div class="message-body">
+        <table class="table">
+          <tr>
+            <th>Status</th>
+            <td><%= need.completed_on.present? ? 'Completed' : 'To do'%></td>
+          </tr>
+
+          <tr>
+            <th>Author</th>
+            <td><%= dash_if_empty need.author %></td>
+          </tr>
+
+          <tr>
+            <th>Assigned to</th>
+            <td><%= dash_if_empty need.assigned_to %></td>
+          </tr>
+
+          <tr>
+            <th>Description</th>
+            <td><%= dash_if_empty need.name %></td>
+          </tr>
+
+          <tr>
+            <th>Notes</th>
+            <td class="notes content">
+              <% if need.notes.manual.size > 0 %>
+                <ul>
+                  <% need.notes.manual.each do |note| %>
+                    <li>
+                      <%= note.category %>
+                      on
+                      <%= note.created_at.strftime('%-d %B %Y') %>
+                      <% if note.body %>
+                        <br>
+                        <em><%= note.body %></em>
+                      <% end %>
+                    </li>
+                  <% end %>
+                </ul>
+              <% else %>
+                —
+              <% end %>
+            </td>
+          </tr>
+        </table>
+      </div>
+  </div>
+<% end %>
+
+<h2 class="title is-4">We erased those and replaced them with:</h2>
+<p>These would have been generated automatically by the re-import process.</p>
+<div class="content">
+  <ul>
+    <li>
+      Created a Phone triage need with
+      <strong><%= pluralize(@call_log.original_triage_call_notes_count, 'call log') %></strong>
+      <% if @call_log.original_triage_call_notes_count %>
+        of type
+        <strong><%= @call_log.original_triage_call_notes_type %></strong>
+      <% end %>
+      and marked it
+      <strong><%= @call_log.original_triage_status %></strong>
+    </li>
+    <% if @call_log.food_need.present? %>
+      <li><%= simple_format @call_log.food_need %></li>
+    <% end %>
+    <% if @call_log.callback_need.present? %>
+      <li><%= simple_format @call_log.callback_need %></li>
+    <% end %>
+    <% if @call_log.remaining_needs.present? %>
+      <li><%= simple_format @call_log.remaining_needs %></li>
+    <% end %>
+  </ul>
+</div>
+
+<%= form_with(model: @call_log, method: 'patch', local: true) do |f| %>
+  <fieldset class="control review-status">
+    <legend class="title is-4">Status of this QA review</legend>
+
+    <%= f.collection_radio_buttons(:status, CallLog.statuses, :first, :first) do |b|
+      b.label(class: 'radio') { b.radio_button + b.text }
+    end %>
+  </fieldset>
+
+  <%= f.submit 'Save', class: 'button is-primary is-large' %>
+
+<% end %>

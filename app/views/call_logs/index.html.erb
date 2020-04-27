@@ -1,0 +1,28 @@
+<table class="table is-bordered is-striped">
+  <thead>
+    <tr>
+      <th>Contact ID</th>
+      <th>Latest attempt date</th>
+      <th>Previous needs</th>
+      <th>Status of review</th>
+      <th>View</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @call_logs.each do |log| %>
+      <tr>
+        <td>
+          <a href="<%= beacon_contact log.contact_id %>">
+            <%= log.contact_id %>
+          </a>
+        </td>
+        <td><%= log.latest_attempt_date.strftime('%-d %B %Y') %></td>
+        <td><%= log.needs.size %></td>
+        <td><%= log.status %></td>
+        <td><a href="/call_logs/<%= log.contact_id %>">View</a></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<%= paginate @call_logs, window: 0 %>

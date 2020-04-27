@@ -1,0 +1,30 @@
+// Place all the styles related to the CallLogs controller here.
+// They will automatically be included in application.css.
+// You can use Sass (SCSS) here: https://sass-lang.com/
+@import "bulma";
+
+main.container {
+  margin-bottom: 50px;
+}
+
+.view-in-beacon {
+  margin-bottom: 20px;
+}
+
+.existing-need {
+  width: 40%;
+  margin: 10px;
+  display: inline-block;
+
+  th {
+    min-width: 130px;
+  }
+
+  .notes ul {
+    margin-left: 0;
+  }
+}
+
+.review-status {
+  margin-bottom: 20px;
+}
